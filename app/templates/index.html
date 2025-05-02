@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система учета жирафов в зоопарке</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c6e49;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            border: 2px solid #4c956c;
+        }
+
+        .upload-section {
+            border-color: #4c956c;
+        }
+
+        .results-section {
+            border-color: #2c6e49;
+        }
+
+        .history-section {
+            border-color: #2c6e49;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .image-box {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        .stats {
+            background: #e3f2e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        .stats p {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #4c956c;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .btn:hover {
+            background: #2c6e49;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #d64045;
+            order: 2;
+        }
+
+        .btn-danger:hover {
+            background: #a6262e;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .history-table th, .history-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .history-table th {
+            background-color: #4c956c;
+            color: white;
+            font-weight: bold;
+        }
+
+        .history-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .history-table tr:hover {
+            background-color: #e3f2e8;
+        }
+
+        .actions {
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #fileInput {
+            margin: 15px 0;
+            padding: 10px;
+            border: 2px dashed #4c956c;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #fileInput:hover {
+            background-color: #f0f8ff;
+        }
+
+        button[type="submit"] {
+            background: #4c956c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background: #2c6e49;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .image-container {
+                flex-direction: column;
+            }
+
+            .image-box {
+                min-width: 100%;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+
+            .history-table {
+                font-size: 0.85em;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Система учета жирафов в зоопарке</h1>
+
+        <div class="section upload-section">
+            <h2>Загрузка изображения или видео</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="fileInput" name="file" accept="image/*,video/*" required>
+                <button type="submit">Анализировать файл</button>
+            </form>
+        </div>
+
+        <div class="section results-section">
+            <h2>Результаты анализа</h2>
+            <div class="image-container">
+                <div class="image-box">
+                    <h3 id="originalTitle">Исходный файл</h3>
+                    <div id="originalMediaContainer">
+                        <!-- Для изображений -->
+                        <img id="originalImage" src="" alt="Исходное изображение" class="hidden" style="max-width: 100%;">
+                        <!-- Для видео -->
+                        <video id="originalVideo" controls class="hidden" style="max-width: 100%;">
+                            Ваш браузер не поддерживает видео тег.
+                        </video>
+                    </div>
+                </div>
+                <div class="image-box">
+                    <h3 id="processedTitle">Результат анализа</h3>
+                    <div id="processedMediaContainer">
+                        <!-- Для изображений -->
+                        <img id="processedImage" src="" alt="Результат анализа" class="hidden" style="max-width: 100%;">
+                        <!-- Для видео -->
+                        <video id="processedVideo" controls class="hidden" style="max-width: 100%;">
+                            Ваш браузер не поддерживает видео тег.
+                        </video>
+                    </div>
+                </div>
+            </div>
+            <div class="stats">
+                <p><strong>Обнаружено жирафов:</strong> <span id="giraffeCount">0</span></p>
+                <p><strong>Время обработки:</strong> <span id="processingTime">0</span> сек</p>
+            </div>
+        </div>
+
+        <div class="section history-section">
+            <h2>История</h2>
+            <div class="actions">
+                <a href="/report/pdf" class="btn">Скачать отчет (PDF)</a>
+                <a href="/report/excel" class="btn">Скачать отчет (Excel)</a>
+                <button id="clearHistoryBtn" class="btn btn-danger">Очистить историю</button>
+            </div>
+
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Дата и время</th>
+                        <th>Исходные данные</th>
+                        <th>Результат</th>
+                        <th>Количество</th>
+                        <th>Время обработки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td>{{ item.timestamp.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td><a href="/static/uploads/{{ item.original_image }}" target="_blank">Просмотр</a></td>
+                        <td><a href="/static/results/{{ item.processed_image }}" target="_blank">Просмотр</a></td>
+                        <td>{{ item.giraffe_count }}</td>
+                        <td>{{ "%.2f"|format(item.processing_time) }} сек</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert('Пожалуйста, выберите файл для анализа');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                // Показать индикатор загрузки
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('loading');
+                submitBtn.textContent = 'Анализ...';
+
+                const response = await fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    if (data.is_video) {
+                        // Для видео
+                        document.getElementById('originalTitle').textContent = 'Исходное видео';
+                        document.getElementById('processedTitle').textContent = 'Результат анализа видео';
+
+                        // Скрываем все изображения
+                        document.querySelectorAll('img').forEach(img => img.classList.add('hidden'));
+
+                        // Показываем видео элементы
+                        const originalVideo = document.getElementById('originalVideo');
+                        const processedVideo = document.getElementById('processedVideo');
+
+                        originalVideo.src = `/static/uploads/${data.original}?t=${Date.now()}`;
+                        processedVideo.src = `/static/results/${data.processed}?t=${Date.now()}`;
+
+                        originalVideo.classList.remove('hidden');
+                        processedVideo.classList.remove('hidden');
+
+                        // Важно: перезагружаем видео для применения изменений
+                        originalVideo.load();
+                        processedVideo.load();
+                    } else {
+                        // Для изображений
+                        document.getElementById('originalTitle').textContent = 'Исходное изображение';
+                        document.getElementById('processedTitle').textContent = 'Результат анализа';
+
+                        // Скрываем все видео элементы
+                        document.querySelectorAll('video').forEach(video => video.classList.add('hidden'));
+
+                        // Показываем изображения
+                        const originalImg = document.getElementById('originalImage');
+                        const processedImg = document.getElementById('processedImage');
+
+                        originalImg.src = `/static/uploads/${data.original}?t=${Date.now()}`;
+                        processedImg.src = `/static/results/${data.processed}?t=${Date.now()}`;
+
+                        originalImg.classList.remove('hidden');
+                        processedImg.classList.remove('hidden');
+                    }
+
+                    document.getElementById('giraffeCount').textContent = data.count;
+                    document.getElementById('processingTime').textContent = data.processing_time;
+
+                    // Обновляем историю через AJAX
+                    await updateHistory();
+                } else {
+                    alert(`Ошибка: ${data.message}`);
+                }
+            } catch (error) {
+                alert('Произошла ошибка при анализе файла');
+                console.error(error);
+            } finally {
+                // Восстановить кнопку
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+                submitBtn.textContent = 'Анализировать файл';
+            }
+        });
+
+        async function updateHistory() {
+            try {
+                const historySection = document.querySelector('.history-section');
+                historySection.classList.add('loading');
+
+                const response = await fetch('/history');
+                const html = await response.text();
+
+                // Парсим HTML и извлекаем только нужную часть
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newHistorySection = doc.querySelector('.history-section');
+
+                if (newHistorySection) {
+                    document.querySelector('.history-section').innerHTML = newHistorySection.innerHTML;
+
+                    // Перепривязываем обработчики событий для новых кнопок
+                    document.getElementById('clearHistoryBtn').addEventListener('click', clearHistoryHandler);
+                }
+            } catch (error) {
+                console.error('Ошибка при обновлении истории:', error);
+            } finally {
+                document.querySelector('.history-section').classList.remove('loading');
+            }
+        }
+
+        function clearHistoryHandler() {
+            if (confirm('Вы уверены, что хотите очистить всю историю анализов? Это действие нельзя отменить.')) {
+                fetch('/clear_history', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        return updateHistory();
+                    }
+                    throw new Error(data.message);
+                })
+                .catch(error => {
+                    alert('Ошибка при очистке истории: ' + error.message);
+                    console.error(error);
+                });
+            }
+        }
+
+        // Инициализация обработчиков
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearHistoryHandler);
+    </script>
+</body>
+</html>
